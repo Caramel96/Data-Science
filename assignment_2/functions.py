@@ -335,15 +335,3 @@ def plot_fair_metrics(fair_metrics):
         ax.set_ylabel('')    
         ax.set_xlabel('')
         
-def get_attributes(data, selected_attr=None):
-    unprivileged_groups = []
-    privileged_groups = []
-    if selected_attr == None:
-        selected_attr = data.protected_attribute_names
-    
-    for attr in selected_attr:
-            idx = data.protected_attribute_names.index(attr)
-            privileged_groups.append({attr:data.privileged_protected_attributes[idx]}) 
-            unprivileged_groups.append({attr:data.unprivileged_protected_attributes[idx]}) 
-
-    return privileged_groups, unprivileged_groups
