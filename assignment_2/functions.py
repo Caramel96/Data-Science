@@ -1,12 +1,46 @@
 def drop_columns(data):
   data_drop = data.copy()
-  cols_to_drop = ['Date', 'Policing operation', 'Latitude', 'Longitude', 'Self-defined ethnicity', 'Removal of more than just outer clothing', 'Outcome linked to object of search']
+  cols_to_drop = ['Date', 'Part of a policing operation', 'Policing operation', 'Latitude', 'Longitude', 'Self-defined ethnicity', 'Removal of more than just outer clothing', 'Outcome linked to object of search']
  
   data_drop.drop(columns=cols_to_drop, inplace=True)
 
   data_drop.dropna(inplace=True)
 
+  data_drop = data_drop.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
+           'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
+           'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken', 'Offender cautioned':'Action Taken', 'Offender given penalty notice': 'Action Taken'}})
+
   return data_drop
+
+def drop_met(data):
+ data_drop_met = data.copy()
+ cols_to_drop_met = ['Date', 'Policing operation',  'Latitude', 'Longitude', 'Self-defined ethnicity', 'Removal of more than just outer clothing', 'Outcome linked to object of search', 'Force']
+ data_drop_met.drop(columns=cols_to_drop_met, inplace=True)
+ data_drop_met.dropna(inplace=True)
+ data_drop_met = data_drop_met.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
+           'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
+           'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken', 'Offender cautioned':'Action Taken', 'Offender given penalty notice': 'Action Taken'}})
+ return data_drop_met
+
+def drop_man(data):
+ data_drop_man = data.copy()
+ cols_to_drop_man = ['Date', 'Policing operation',  'Latitude', 'Longitude', 'Self-defined ethnicity', 'Outcome linked to object of search', 'Force']
+ data_drop_man.drop(columns=cols_to_drop_man, inplace=True)
+ data_drop_man.dropna(inplace=True)
+ data_drop_man = data_drop_man.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
+           'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
+           'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken', 'Offender cautioned':'Action Taken', 'Offender given penalty notice': 'Action Taken'}})
+ return data_drop_man
+
+def drop_leic(data):
+ data_drop_lc = data.copy()
+ cols_to_drop_lc = ['Date', 'Part of a policing operation', 'Policing operation', 'Latitude', 'Longitude', 'Self-defined ethnicity', 'Removal of more than just outer clothing', 'Outcome linked to object of search', 'Force']
+ data_drop_lc.drop(columns=cols_to_drop_lc, inplace=True)
+ data_drop_lc.dropna(inplace=True)
+ data_drop_lc = data_drop_lc.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
+           'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
+           'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken'}})
+ return data_drop_lc
 
 def encode_data(data):
   categorical_features = ['Type', 'Gender', 'Age range', 'Officer-defined ethnicity', 'Legislation', 'Object of search', 'Outcome', 'Force']
@@ -27,10 +61,55 @@ def encode_data(data):
   return data_encoded
 
 def decode_dataset(data, encoders, categorical_features):
+  categorical_features = ['Type', 'Gender', 'Age range', 'Officer-defined ethnicity', 'Legislation', 'Object of search', 'Outcome', 'Force']
     df = data.copy()
     for feat in categorical_features:
         df[feat] = encoders[feat].inverse_transform(df[feat])
     return df
+def StandardDataset_all(data):
+
+  privileged_sex = np.where(categorical_names['Gender'] == 'Male')[0]
+  privileged_race = np.where(categorical_names['Officer-defined ethnicity'] == 'White')[0]
+  data_orig_outcomes_all = StandardDataset(data, 
+                               label_name='Outcome', 
+                               favorable_classes=[1], 
+                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_sex, privileged_race])
+  return data_orig_outcomes_all
+
+def StandardDataset_man(data):
+
+  privileged_sex_man = np.where(categorical_names_man['Gender'] == 'Male')[0]
+  privileged_race_man = np.where(categorical_names_man['Officer-defined ethnicity'] == 'White')[0]
+  data_orig_outcomes_man = StandardDataset(data, 
+                               label_name='Outcome', 
+                               favorable_classes=[1], 
+                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_sex_man, privileged_race_man])
+  return data_orig_outcomes_man
+
+def StandardDataset_lc(data):
+
+  privileged_sex = np.where(categorical_names_lc['Gender'] == 'Male')[0]
+  privileged_race = np.where(categorical_names_lc['Officer-defined ethnicity'] == 'White')[0]
+  data_orig_outcomes_lc = StandardDataset(data, 
+                               label_name='Outcome', 
+                               favorable_classes=[1], 
+                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_sex, privileged_race])
+  return data_orig_outcomes_lc
+
+def StandardDataset_met(data):
+
+  privileged_sex = np.where(categorical_names_met['Gender'] == 'Male')[0]
+  privileged_race = np.where(categorical_names_met['Officer-defined ethnicity'] == 'White')[0]
+  data_orig_outcomes_met = StandardDataset(data, 
+                               label_name='Outcome', 
+                               favorable_classes=[1], 
+                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_sex, privileged_race])
+  return data_orig_outcomes_met
+
 
 
 def meta_data(dataset):
@@ -125,6 +204,28 @@ def test(dataset, model, thresh_arr):
         metric_arrs['theil_ind'].append(metric.theil_index())
     
     return metric_arrs
+  
+def plot(x, x_name, y_left, y_left_name, y_right, y_right_name):
+    fig, ax1 = plt.subplots(figsize=(10,7))
+    ax1.plot(x, y_left)
+    ax1.set_xlabel(x_name, fontsize=16, fontweight='bold')
+    ax1.set_ylabel(y_left_name, color='b', fontsize=16, fontweight='bold')
+    ax1.xaxis.set_tick_params(labelsize=14)
+    ax1.yaxis.set_tick_params(labelsize=14)
+    ax1.set_ylim(0.5, 0.8)
+
+    ax2 = ax1.twinx()
+    ax2.plot(x, y_right, color='r')
+    ax2.set_ylabel(y_right_name, color='r', fontsize=16, fontweight='bold')
+    if 'DI' in y_right_name:
+        ax2.set_ylim(0., 0.7)
+    else:
+        ax2.set_ylim(-0.25, 0.1)
+
+    best_ind = np.argmax(y_left)
+    ax2.axvline(np.array(x)[best_ind], color='k', linestyle=':')
+    ax2.yaxis.set_tick_params(labelsize=14)
+    ax2.grid(True)
 
 def add_to_df_algo_metrics(algo_metrics, model, fair_metrics, preds, probs, name):
     return algo_metrics.append(pd.DataFrame(data=[[model, fair_metrics, preds, probs]], columns=['model', 'fair_metrics', 'prediction', 'probs'], index=[name]))
@@ -233,3 +334,16 @@ def plot_fair_metrics(fair_metrics):
         plt.title(cols[i])
         ax.set_ylabel('')    
         ax.set_xlabel('')
+        
+def get_attributes(data, selected_attr=None):
+    unprivileged_groups = []
+    privileged_groups = []
+    if selected_attr == None:
+        selected_attr = data.protected_attribute_names
+    
+    for attr in selected_attr:
+            idx = data.protected_attribute_names.index(attr)
+            privileged_groups.append({attr:data.privileged_protected_attributes[idx]}) 
+            unprivileged_groups.append({attr:data.unprivileged_protected_attributes[idx]}) 
+
+    return privileged_groups, unprivileged_groups
