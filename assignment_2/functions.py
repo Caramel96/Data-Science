@@ -12,7 +12,6 @@ from time import time
 
 # Graphs libraries
 import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 plt.style.use('seaborn-white')
 import seaborn as sns
@@ -401,7 +400,152 @@ def plot_fair_metrics(fair_metrics):
         ax.set_ylabel('')    
         ax.set_xlabel('')
         
- 
+        
+        
+def compare_fair_metrics(algo_metrics, attr='Victim Race'):
+    
+    df_metrics = pd.DataFrame(columns=algo_metrics.loc['Origin','fair_metrics'].columns.values)
+    for fair in algo_metrics.loc[:,'fair_metrics']:
+        df_metrics = df_metrics.append(fair.loc[attr], ignore_index=True)
+
+    df_metrics.index = algo_metrics.index.values
+    df_metrics = df_metrics.replace([np.inf, -np.inf], np.NaN)
+    
+    display(df_metrics)
+    plot_fair_metrics_plotly(df_metrics)
+    score = score_fair_metrics(df_metrics)
+    plot_score_fair_metrics(score.dropna())
+        
+      
+
+def plot_fair_metrics_plotly(fair_metrics):
+    bottom = [-1, -1, -1, 0, 0]
+    max_valid = [0.1, 0.1, 0.1, 1.2, 0.25]
+    min_valid = [-0.1, -0.1, -0.1, 0.8, 0]
+    cols = fair_metrics.columns.values
+
+    for i in range(0, 5):
+        col = cols[i]
+
+        x, y = (fair_metrics[col].values, fair_metrics.index)
+        colors = []
+        for v in x:
+            color = '#e74c3c' if v < min_valid[i] or v > max_valid[i] else '#2ecc71'
+            colors.append(color)
+
+        trace = go.Bar(x=x, y=y, marker=dict(color=colors)
+                       , opacity=0.9, orientation='h')
+
+        layout = go.Layout(barmode='group',
+                           title=col,
+                           xaxis=dict(range=[bottom[i], bottom[i] + 2]),
+                           yaxis=go.layout.YAxis(automargin=True),
+                           shapes=[
+                               {
+                                   'type': 'line',
+                                   'x0': min_valid[i],
+                                   'y0': -1,
+                                   'x1': min_valid[i],
+                                   'y1': len(y),
+                                   'line': {
+                                       'color': 'rgb(0, 0, 0)',
+                                       'width': 2,
+                                   },
+                               }, {
+                                   'type': 'line',
+                                   'x0': max_valid[i],
+                                   'y0': -1,
+                                   'x1': max_valid[i],
+                                   'y1': len(y),
+                                   'line': {
+                                       'color': 'rgb(0, 0, 0)',
+                                       'width': 2,
+                                   },
+                               }])
+        fig = go.Figure([trace], layout=layout)
+        py.iplot(fig)
+
+
+def plot_compare_model_performance(algo_metrics, dataset):
+    X_test = dataset.features
+    y_true = dataset.labels
+    perf_metrics = pd.DataFrame()
+
+    models_name = algo_metrics.index.values
+
+    fig = plt.figure(figsize=(7, 7))
+    plt.title('ROC curve for differents models')
+    lw = 2
+    palette = sns.color_palette("Paired")
+
+    for model_name, i in zip(models_name, range(0, len(models_name))):
+        model = algo_metrics.loc[model_name, 'model']
+
+        if model_name != 'AdvDebiasing':
+            probs = algo_metrics.loc[model_name, 'probs']
+            y_pred = algo_metrics.loc[model_name, 'prediction']
+            accuracy, matrix, f1, fpr, tpr, roc_auc = get_model_performance(X_test, y_true, y_pred, probs)
+
+            perf_metrics = perf_metrics.append(
+                pd.DataFrame([[accuracy, f1]], columns=['Accuracy', 'F1 Score'], index=[model_name]))
+            plt.plot(fpr, tpr, color=palette[i], lw=lw, label=str(model_name) + ' (area = %0.2f)' % roc_auc)
+
+    plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic curve')
+    plt.legend(loc="lower right")
+    display(perf_metrics.sort_values(by=['Accuracy', 'F1 Score'], ascending=[False, False]))
+    plt.show()        
+        
+
+def plot_score_fair_metrics(score):
+    display(score.sort_values(['nb_valid', 'score'], ascending=[0, 1]))
+    score.sort_values(['nb_valid', 'score'], ascending=[1, 0], inplace=True)
+
+    gold, silver, bronze, other = ('#FFA400', '#bdc3c7', '#cd7f32', '#3498db')
+    colors = [gold if i == 0 else silver if i == 1 else bronze if i == 2 else other for i in range(0, len(score))]
+    colors = [c for c in reversed(colors)]
+
+    x, y = (score['score'].values, score.index)
+
+    trace = go.Bar(x=x, y=y, marker=dict(color=colors)
+                   , opacity=0.9, orientation='h')
+    layout = go.Layout(barmode='group',
+                       title='Fairest algorithm',
+                       yaxis=go.layout.YAxis(automargin=True))
+    fig = go.Figure([trace], layout=layout)
+    py.iplot(fig)
+    
+
+def score_fair_metrics(fair):
+    objective = [0, 0, 0, 1, 0]
+    max_valid = [0.1, 0.1, 0.1, 1.2, 0.25]
+    min_valid = [-0.1, -0.1, -0.1, 0.8, 0]
+
+    nb_valid = np.sum(((fair.values > min_valid) * (fair.values < max_valid)), axis=1)
+    score = np.sum(np.abs(fair.values - objective), axis=1)
+    score = np.array([score, nb_valid])
+
+    score = pd.DataFrame(data=score.transpose(), columns=['score', 'nb_valid'], index=fair.index)
+    return score
+
+
+def score_all_attr(algo_metrics):
+    attributes = algo_metrics.loc['Origin', 'fair_metrics'].index.values[1:]
+
+    all_scores = np.zeros((len(algo_metrics), 2))
+    for attr in attributes:
+        df_metrics = pd.DataFrame(columns=algo_metrics.loc['Origin', 'fair_metrics'].columns.values)
+        for fair in algo_metrics.loc[:, 'fair_metrics']:
+            df_metrics = df_metrics.append(fair.loc[attr], ignore_index=True)
+        all_scores = all_scores + score_fair_metrics(df_metrics).values
+
+    final = pd.DataFrame(data=all_scores, columns=['score', 'nb_valid'], index=algo_metrics.index)
+    return final      
+      
 
 local_path2 = '/content/Samuel_BuckbyCE888/Assigment_1/data/Stop_and_search_LC'
 all_files2 = glob.glob(local_path2 + "/*.csv")
