@@ -1,3 +1,69 @@
+import numpy as np
+import pandas as pd
+import glob
+from sklearn import preprocessing
+from sklearn.preprocessing import OneHotEncoder
+%matplotlib inline
+# data manipulation libraries
+import pandas as pd
+import numpy as np
+
+from time import time
+
+# Graphs libraries
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+plt.style.use('seaborn-white')
+import seaborn as sns
+pip install 'aif360[all]'
+
+pip install aif360
+
+
+import plotly.offline as py
+py.init_notebook_mode(connected=True)
+import plotly.graph_objs as go
+import plotly.tools as tls
+import plotly.figure_factory as ff
+from plotly import tools
+
+# Libraries to study
+from aif360.datasets import StandardDataset
+from aif360.metrics import BinaryLabelDatasetMetric, ClassificationMetric
+from aif360.algorithms.preprocessing import LFR, Reweighing
+from aif360.algorithms.inprocessing import AdversarialDebiasing, PrejudiceRemover
+from aif360.algorithms.postprocessing import CalibratedEqOddsPostprocessing, EqOddsPostprocessing, RejectOptionClassification
+from aif360.algorithms.preprocessing import DisparateImpactRemover
+
+# ML libraries
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, roc_curve, auc
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+import tensorflow as tf
+
+# Design libraries
+from IPython.display import Markdown, display
+import warnings
+warnings.filterwarnings("ignore")
+
+from aif360.explainers import MetricTextExplainer
+from collections import defaultdict
+from aif360.datasets import BinaryLabelDataset
+from aif360.metrics import BinaryLabelDatasetMetric
+from aif360.metrics import ClassificationMetric
+from aif360.algorithms.preprocessing.reweighing import Reweighing
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
+
+from IPython.display import Markdown, display
+import matplotlib.pyplot as plt
+
+
+
+
 def drop_columns(data):
   data_drop = data.copy()
   cols_to_drop = ['Date', 'Part of a policing operation', 'Policing operation', 'Latitude', 'Longitude', 'Self-defined ethnicity', 'Removal of more than just outer clothing', 'Outcome linked to object of search']
@@ -334,4 +400,170 @@ def plot_fair_metrics(fair_metrics):
         plt.title(cols[i])
         ax.set_ylabel('')    
         ax.set_xlabel('')
+        
+ 
+
+local_path2 = '/content/Samuel_BuckbyCE888/Assigment_1/data/Stop_and_search_LC'
+all_files2 = glob.glob(local_path2 + "/*.csv")
+li2 = []
+for filename2 in all_files2:
+    df2 = pd.read_csv(filename2)
+    li2.append(df2)
+stop_search_lc = pd.concat(li2, axis=0, ignore_index=True)
+
+local_path3 = '/content/Samuel_BuckbyCE888/Assigment_1/data/Stop_and_search_Met'
+all_files3 = glob.glob(local_path3 + "/*.csv")
+li3 = []
+for filename3 in all_files3:
+    df3 = pd.read_csv(filename3)
+    li3.append(df3)
+stop_search_met = pd.concat(li3, axis=0, ignore_index=True)
+
+local_path4 = '/content/Samuel_BuckbyCE888/Assigment_1/data/Stop_Search_Man'
+all_files4 = glob.glob(local_path4 + "/*.csv")
+li4 = []
+for filename4 in all_files4:
+    df4 = pd.read_csv(filename4)
+    li4.append(df4)
+stop_search_man = pd.concat(li4, axis=0, ignore_index=True)
+
+stop_search_lc['Force'] = 'Leicester'
+stop_search_met['Force'] = 'Metropolitan'
+stop_search_man['Force'] = 'Manchester'
+
+stop_search = pd.concat([stop_search_lc,stop_search_met, stop_search_man])
+
+stop_search['Date'] = pd.to_datetime(stop_search['Date'])
+stop_search['Date'] = stop_search['Date'].dt.date
+stop_search['Date'] = pd.to_datetime(stop_search['Date'])
+
+leic_2020 = (stop_search['Date'] < '2019-06-30') & (stop_search['Force'] == 'Leicester')
+leic_2020 = stop_search.loc[leic_2020]
+
+met_2020 = (stop_search['Date'] < '2019-06-30') & (stop_search['Force'] == 'Metropolitan')
+met_2020  = stop_search.loc[met_2020 ]
+
+man_2020 = (stop_search['Date'] < '2019-06-30') & (stop_search['Force'] == 'Manchester')
+man_2020 = stop_search.loc[man_2020]
+
+all_force = pd.concat([man_2020, leic_2020, met_2020 ])
+all_force.shape
+
+
+
+data_all = drop_columns(all_force)
+
+met_drop = drop_met(met_2020)
+
+man_drop = drop_man(man_2020)
+
+leic_drop = drop_leic(leic_2020)
+
+
+categorical_features = ['Type', 'Gender', 'Age range', 'Officer-defined ethnicity', 'Legislation', 'Object of search', 'Outcome', 'Force']
+data_encoded = data_all.copy()
+
+categorical_names = {}
+encoders = {}
+
+
+for feature in categorical_features:
+    le = LabelEncoder()
+    le.fit(data_encoded[feature])
+    
+    data_encoded[feature] = le.transform(data_encoded[feature])
+    
+    categorical_names[feature] = le.classes_
+    encoders[feature] = le
+
+
+def decode_dataset(data, encoders, categorical_features):
+    df = data.copy()
+    for feat in categorical_features:
+        df[feat] = encoders[feat].inverse_transform(df[feat])
+    return df
+
+
+categorical_features_lc = ['Type',	'Gender',	'Age range',	'Officer-defined ethnicity',	'Legislation',	'Object of search',	'Outcome']
+data_encoded_lc = leic_drop.copy()
+
+categorical_names_lc = {}
+encoders_lc = {}
+
+
+for feature in categorical_features_lc:
+    le = LabelEncoder()
+    le.fit(data_encoded_lc[feature])
+    
+    data_encoded_lc[feature] = le.transform(data_encoded_lc[feature])
+    
+    categorical_names_lc[feature] = le.classes_
+    encoders_lc[feature] = le
+
+
+def decode_dataset_lc(data, encoders, categorical_features):
+    df_lc = data.copy()
+    for feat in categorical_features_lc:
+        df_lc[feat] = encoders_lc[feat].inverse_transform(df_lc[feat])
+    return df_lc
+
+
+categorical_features_man = ['Type', 'Gender',	'Age range',	'Officer-defined ethnicity',	'Legislation',	'Object of search',	'Outcome', 'Removal of more than just outer clothing']
+data_encoded_man = man_drop.copy()
+
+categorical_names_man = {}
+encoders_man = {}
+
+
+for feature in categorical_features_man:
+    le = LabelEncoder()
+    le.fit(data_encoded_man[feature])
+    
+    data_encoded_man[feature] = le.transform(data_encoded_man[feature])
+    
+    categorical_names_man[feature] = le.classes_
+    encoders_man[feature] = le
+
+
+def decode_dataset_man(data, encoders, categorical_features):
+    df_man = data.copy()
+    for feat in categorical_features_man:
+        df_man[feat] = encoders_man[feat].inverse_transform(df_man[feat])
+    return df_man
+
+
+categorical_features_met = ['Type', 'Gender',	'Age range',	'Officer-defined ethnicity',	'Legislation',	'Object of search',	'Outcome']
+data_encoded_met = met_drop.copy()
+
+categorical_names_met = {}
+encoders_met = {}
+
+
+for feature in categorical_features_met:
+    le = LabelEncoder()
+    le.fit(data_encoded_met[feature])
+    
+    data_encoded_met[feature] = le.transform(data_encoded_met[feature])
+    
+    categorical_names_met[feature] = le.classes_
+    encoders_met[feature] = le
+
+
+def decode_dataset_met(data, encoders, categorical_features):
+    df_met = data.copy()
+    for feat in categorical_features_met:
+        df_met[feat] = encoders_met[feat].inverse_transform(df_met[feat])
+    return df_met
+
+met = data_encoded_met
+leic = data_encoded_lc
+man = data_encoded_man
+all_f = data_encoded
+
+all_standard = StandardDataset_all(all_f)
+lc_standard = StandardDataset_lc(leic)
+met_standard = StandardDataset_met(met)
+man_standard = StandardDataset_man(man)
+
+                        
         
