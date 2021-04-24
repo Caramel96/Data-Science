@@ -3,7 +3,6 @@ import pandas as pd
 import glob
 from sklearn import preprocessing
 from sklearn.preprocessing import OneHotEncoder
-%matplotlib inline
 # data manipulation libraries
 import pandas as pd
 import numpy as np
@@ -15,9 +14,7 @@ import matplotlib
 import matplotlib.patches as patches
 plt.style.use('seaborn-white')
 import seaborn as sns
-pip install 'aif360[all]'
 
-pip install aif360
 
 
 import plotly.offline as py
