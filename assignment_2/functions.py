@@ -124,7 +124,7 @@ def encode_data(data):
 
 def decode_dataset(data, encoders, categorical_features):
   categorical_features = ['Type', 'Gender', 'Age range', 'Officer-defined ethnicity', 'Legislation', 'Object of search', 'Outcome', 'Force']
-    df = data.copy()
+  df = data.copy()
     for feat in categorical_features:
         df[feat] = encoders[feat].inverse_transform(df[feat])
     return df
