@@ -399,7 +399,7 @@ def plot_fair_metrics(fair_metrics):
         
         
         
-def compare_fair_metrics(algo_metrics, attr='Victim Race'):
+def compare_fair_metrics(algo_metrics, attr):
     
     df_metrics = pd.DataFrame(columns=algo_metrics.loc['Origin','fair_metrics'].columns.values)
     for fair in algo_metrics.loc[:,'fair_metrics']:
