@@ -82,6 +82,7 @@ def drop_met(data):
  data_drop_met = data_drop_met.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
            'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
            'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken', 'Offender cautioned':'Action Taken', 'Offender given penalty notice': 'Action Taken'}})
+ data_drop_met = data_drop_met.replace({'Officer-defined ethnicity' :  {'Asian': 'BAME', 'Black': 'BAME', 'Other': 'BAME'}})
  return data_drop_met
 
 def drop_man(data):
@@ -92,6 +93,7 @@ def drop_man(data):
  data_drop_man = data_drop_man.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
            'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
            'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken', 'Offender cautioned':'Action Taken', 'Offender given penalty notice': 'Action Taken'}})
+ data_drop_man = data_drop_man.replace({'Officer-defined ethnicity' :  {'Asian': 'BAME', 'Black': 'BAME', 'Other': 'BAME'}})
  return data_drop_man
 
 def drop_leic(data):
@@ -102,6 +104,7 @@ def drop_leic(data):
  data_drop_lc = data_drop_lc.replace({'Outcome' :  {'Arrest': 'Action Taken', 'Community resolution': 'Action Taken', 'Nothing found - no further action': 'A no further action disposal', 'Khat or Cannabis warning': 'Action Taken', 
            'Suspect arrested': 'Action Taken', 'Local resolution': 'Action Taken', 'Summons / charged by post': 'Action Taken', 
            'Caution (simple or conditional)': 'Action Taken', 'Offender given drugs possession warning': 'Action Taken', 'Suspect summonsed to court': 'Action Taken', 'Penalty Notice for Disorder': 'Action Taken'}})
+ data_drop_lc = data_drop_lc.replace({'Officer-defined ethnicity' :  {'Asian': 'BAME', 'Black': 'BAME', 'Other': 'BAME'}})
  return data_drop_lc
 
 def encode_data(data):
