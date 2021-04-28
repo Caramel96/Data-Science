@@ -189,6 +189,26 @@ def meta_data(dataset):
     print(dataset.privileged_protected_attributes, dataset.unprivileged_protected_attributes)
     display(Markdown("#### Dataset feature names"))
     print(dataset.feature_names)
+    
+ 
+def describe(train=None, val=None, test=None):
+    if train is not None:
+        display(Markdown("#### Training Dataset shape"))
+        print(train.features.shape)
+    if val is not None:
+        display(Markdown("#### Validation Dataset shape"))
+        print(val.features.shape)
+    display(Markdown("#### Test Dataset shape"))
+    print(test.features.shape)
+    display(Markdown("#### Favorable and unfavorable labels"))
+    print(test.favorable_label, test.unfavorable_label)
+    display(Markdown("#### Protected attribute names"))
+    print(test.protected_attribute_names)
+    display(Markdown("#### Privileged and unprivileged protected attribute values"))
+    print(test.privileged_protected_attributes, 
+          test.unprivileged_protected_attributes)
+    display(Markdown("#### Dataset feature names"))
+    print(test.feature_names)
 
 def get_attributes(data, selected_attr=None):
     unprivileged_groups = []
