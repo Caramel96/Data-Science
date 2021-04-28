@@ -704,6 +704,8 @@ leic = data_encoded_lc
 man = data_encoded_man
 all_f = data_encoded
 
+met = met.replace({'Gender' :  { 1: 0, 0: 1}})
+
 all_standard = StandardDataset_all(all_f)
 lc_standard = StandardDataset_lc(leic)
 met_standard = StandardDataset_met(met)
