@@ -149,8 +149,8 @@ def StandardDataset_man(data):
   data_orig_outcomes_man = StandardDataset(data, 
                                label_name='Outcome', 
                                favorable_classes=[0], 
-                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
-                               privileged_classes=[privileged_sex_man, privileged_race_man])
+                               protected_attribute_names=['Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_race_man])
   return data_orig_outcomes_man
 
 def StandardDataset_lc(data):
@@ -160,8 +160,8 @@ def StandardDataset_lc(data):
   data_orig_outcomes_lc = StandardDataset(data, 
                                label_name='Outcome', 
                                favorable_classes=[0], 
-                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
-                               privileged_classes=[privileged_sex, privileged_race])
+                               protected_attribute_names=['Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_race])
   return data_orig_outcomes_lc
 
 def StandardDataset_met(data):
@@ -171,8 +171,8 @@ def StandardDataset_met(data):
   data_orig_outcomes_met = StandardDataset(data, 
                                label_name='Outcome', 
                                favorable_classes=[1], 
-                               protected_attribute_names=['Gender','Officer-defined ethnicity'], 
-                               privileged_classes=[privileged_sex, privileged_race])
+                               protected_attribute_names=['Officer-defined ethnicity'], 
+                               privileged_classes=[privileged_race])
   return data_orig_outcomes_met
 
 
