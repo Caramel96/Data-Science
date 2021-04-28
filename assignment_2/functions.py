@@ -144,8 +144,8 @@ def StandardDataset_all(data):
 
 def StandardDataset_man(data):
 
-  privileged_sex_man = np.where(categorical_names_man['Gender'] == 'Male')[0]
-  privileged_race_man = np.where(categorical_names_man['Officer-defined ethnicity'] == 'White')[0]
+  privileged_sex = np.where(categorical_names_man['Gender'] == 'Male')[0]
+  privileged_race = np.where(categorical_names_man['Officer-defined ethnicity'] == 'White')[0]
   data_orig_outcomes_man = StandardDataset(data, 
                                label_name='Outcome', 
                                favorable_classes=[0], 
