@@ -159,7 +159,7 @@ def StandardDataset_lc(data):
   privileged_race = np.where(categorical_names_lc['Officer-defined ethnicity'] == 'White')[0]
   data_orig_outcomes_lc = StandardDataset(data, 
                                label_name='Outcome', 
-                               favorable_classes=[1], 
+                               favorable_classes=[0], 
                                protected_attribute_names=['Gender','Officer-defined ethnicity'], 
                                privileged_classes=[privileged_sex, privileged_race])
   return data_orig_outcomes_lc
@@ -170,7 +170,7 @@ def StandardDataset_met(data):
   privileged_race = np.where(categorical_names_met['Officer-defined ethnicity'] == 'White')[0]
   data_orig_outcomes_met = StandardDataset(data, 
                                label_name='Outcome', 
-                               favorable_classes=[1], 
+                               favorable_classes=[0], 
                                protected_attribute_names=['Gender','Officer-defined ethnicity'], 
                                privileged_classes=[privileged_sex, privileged_race])
   return data_orig_outcomes_met
