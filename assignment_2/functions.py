@@ -209,6 +209,22 @@ def describe(train=None, val=None, test=None):
           test.unprivileged_protected_attributes)
     display(Markdown("#### Dataset feature names"))
     print(test.feature_names)
+    
+    
+    
+    
+def describe_metrics(metrics, thresh_arr):
+    best_ind = np.argmax(metrics['bal_acc'])
+    print("Threshold corresponding to Best balanced accuracy: {:6.4f}".format(thresh_arr[best_ind]))
+    print("Best balanced accuracy: {:6.4f}".format(metrics['bal_acc'][best_ind]))
+#     disp_imp_at_best_ind = np.abs(1 - np.array(metrics['disp_imp']))[best_ind]
+    disp_imp_at_best_ind = 1 - min(metrics['disp_imp'][best_ind], 1/metrics['disp_imp'][best_ind])
+    print("Corresponding 1-min(DI, 1/DI) value: {:6.4f}".format(disp_imp_at_best_ind))
+    print("Corresponding average odds difference value: {:6.4f}".format(metrics['avg_odds_diff'][best_ind]))
+    print("Corresponding statistical parity difference value: {:6.4f}".format(metrics['stat_par_diff'][best_ind]))
+    print("Corresponding equal opportunity difference value: {:6.4f}".format(metrics['eq_opp_diff'][best_ind]))
+    print("Corresponding Theil index value: {:6.4f}".format(metrics['theil_ind'][best_ind]))
+    
 
 def get_attributes(data, selected_attr=None):
     unprivileged_groups = []
