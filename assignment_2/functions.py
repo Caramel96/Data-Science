@@ -170,7 +170,7 @@ def StandardDataset_met(data):
   privileged_race = np.where(categorical_names_met['Officer-defined ethnicity'] == 'White')[0]
   data_orig_outcomes_met = StandardDataset(data, 
                                label_name='Outcome', 
-                               favorable_classes=[1], 
+                               favorable_classes=[0], 
                                protected_attribute_names=['Gender','Officer-defined ethnicity'], 
                                privileged_classes=[privileged_sex, privileged_race])
   return data_orig_outcomes_met
@@ -766,6 +766,10 @@ all_f = data_encoded
 
 met = met.replace({'Gender' :  { 1: 0, 0: 1}})
 met = met.replace({'Outcome' :  { 1: 0, 0: 1}})
+
+man = man.replace({'Gender' :  { 1: 0, 0: 1}})
+
+leic = leic.replace({'Gender' :  { 1: 0, 0: 1}})
 
 all_standard = StandardDataset_all(all_f)
 lc_standard = StandardDataset_lc(leic)
