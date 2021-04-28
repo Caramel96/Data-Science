@@ -1,3 +1,5 @@
+### All the packages
+
 import numpy as np
 import pandas as pd
 import glob
@@ -59,6 +61,8 @@ import matplotlib.pyplot as plt
 
 
 
+### this section includes functions used throughout the notebook, The Plortly functions would not work in colab
+### however this was not tested in other IDE's
 
 def drop_columns(data):
   data_drop = data.copy()
@@ -607,6 +611,10 @@ def render_mpl_table(data, col_width=5.0, row_height=1, font_size=9,
     return ax
       
 
+    
+    
+### This section includes all the pre-processing of the data.    
+    
 local_path2 = '/content/Samuel_BuckbyCE888/Assigment_1/data/Stop_and_search_LC'
 all_files2 = glob.glob(local_path2 + "/*.csv")
 li2 = []
